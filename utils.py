@@ -26,16 +26,19 @@ def preprocess_resume(text: str) -> str:
 # Audio Extraction  (ffmpeg – system or bundled)
 # ─────────────────────────────────────────────
 def _find_ffmpeg() -> str | None:
-    """Search for ffmpeg: system PATH first, then common project locations."""
     # 1. System PATH
     if shutil.which("ffmpeg"):
         return "ffmpeg"
-    # 2. Common bundle locations
+    # 2. imageio ffmpeg (works on Render free tier)
+    try:
+        import imageio_ffmpeg
+        return imageio_ffmpeg.get_ffmpeg_exe()
+    except Exception:
+        pass
+    # 3. Local bundled
     candidates = [
         os.path.join(os.path.dirname(__file__), "ffmpeg.exe"),
         os.path.join(os.path.dirname(__file__), "ffmpeg"),
-        r"C:\ffmpeg\bin\ffmpeg.exe",
-        r"C:\Users\udhay\OneDrive\Desktop\resume_analyzer_project\ffmpeg.exe",
     ]
     for c in candidates:
         if os.path.isfile(c):
